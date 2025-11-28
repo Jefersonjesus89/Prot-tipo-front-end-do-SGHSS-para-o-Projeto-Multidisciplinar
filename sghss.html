@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>SGHSS - Projeto Multidisciplinar</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      background: #f3f3f3;
+    }
+
+    .topo {
+      background: #1b4b82;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .topo nav a {
+      color: #ffeb3b;
+      margin-left: 10px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .conteudo {
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .card h2, .card h3 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #1b4b82;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .rodape {
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      padding: 10px 0;
+    }
+
+    .tabela {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .tabela th, .tabela td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .tabela th {
+      background: #eee;
+    }
+
+    .escondido {
+      display: none;
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    /* Responsivo simples */
+    @media (max-width: 600px) {
+      .card {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topo">
+    <h1 id="tituloTopo">SGHSS - Sistema de Gestão Hospitalar</h1>
+    <nav>
+      <a href="#" onclick="voltarParaLogin()">Login</a>
+    </nav>
+  </header>
+
+  <main class="conteudo">
+
+    <!-- LOGIN -->
+    <section id="loginSection" class="card">
+      <h2>Login</h2>
+
+      <label for="user">Usuário</label>
+      <input type="text" id="user" placeholder="Digite seu usuário">
+
+      <label for="pass">Senha</label>
+      <input type="password" id="pass" placeholder="Digite sua senha">
+
+      <label for="perfil">Perfil</label>
+      <select id="perfil">
+        <option value="">Selecione...</option>
+        <option value="paciente">Paciente</option>
+        <option value="medico">Profissional de Saúde</option>
+        <option value="admin">Administrador</option>
+      </select>
+
+      <button onclick="fazerLogin()">Entrar</button>
+    </section>
+
+    <!-- PACIENTE -->
+    <section id="pacienteSection" class="escondido">
+      <div class="card">
+        <h2>Cadastro de Paciente</h2>
+        <p>Preencha seus dados. Essa parte representa o cadastro de pacientes.</p>
+
+        <label>Nome completo</label>
+        <input id="cadNome" type="text" placeholder="Seu nome">
+
+        <label>CPF</label>
+        <input id="cadCpf" type="text" placeholder="000.000.000-00">
+
+        <label>Data de nascimento</label>
+        <input id="cadData" type="date">
+
+        <label>Informações clínicas</label>
+        <textarea id="cadInfo" rows="3" placeholder="Alergias, doenças crônicas..."></textarea>
+
+        <button onclick="salvarCadastroPaciente()">Salvar cadastro</button>
+      </div>
+
+      <div class="card">
+        <h2>Agendar Consulta</h2>
+
+        <label>Data da consulta</label>
+        <input id="agData" type="date">
+
+        <label>Especialidade</label>
+        <select id="agEsp">
+          <option>Clínico Geral</option>
+          <option>Pediatria</option>
+          <option>Cardiologia</option>
+          <option>Ortopedia</option>
+        </select>
+
+        <label>Tipo de atendimento</label>
+        <select id="agTipo">
+          <option>Presencial</option>
+          <option>Telemedicina</option>
+        </select>
+
+        <button onclick="agendarConsulta()">Agendar</button>
+
+        <h3>Minhas consultas</h3>
+        <ul id="listaConsultas">
+          <!-- consultas do paciente -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Histórico Clínico (simulado)</h2>
+        <ul id="historicoPaciente">
+          <!-- histórico exibido aqui -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Notificações</h2>
+        <p>Aqui o paciente recebe notificações geradas pelo sistema (agendamentos, cancelamentos etc.).</p>
+        <ul id="listaNotificacoes">
+          <!-- notificações -->
+        </ul>
+        <button onclick="limparNotificacoes()">Marcar todas como lidas</button>
+      </div>
+
+      <div class="card">
+        <h2>Teleconsulta</h2>
+        <p>Clique para iniciar uma videochamada segura (simulada) com o profissional.</p>
+        <button onclick="iniciarTeleconsultaPaciente()">Iniciar teleconsulta</button>
+      </div>
+    </section>
+
+    <!-- PROFISSIONAL DE SAÚDE -->
+    <section id="medicoSection" class="escondido">
+      <div class="card">
+        <h2>Agenda do Profissional</h2>
+        <p>O profissional consegue gerenciar sua agenda e visualizar consultas.</p>
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Tipo</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaAgendaMedico">
+            <!-- agenda dinâmica -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Adicionar horário manualmente</h2>
+        <label>Data</label>
+        <input id="medData" type="date">
+
+        <label>Nome do paciente</label>
+        <input id="medPaciente" type="text" placeholder="Nome do paciente">
+
+        <label>Tipo de atendimento</label>
+        <select id="medTipo">
+          <option>Presencial</option>
+          <option>Telemedicina</option>
+        </select>
+
+        <button onclick="adicionarHorarioMedico()">Adicionar à agenda</button>
+      </div>
+
+      <div class="card">
+        <h2>Atualizar Prontuário</h2>
+        <label>Paciente</label>
+        <input id="prontPaciente" type="text" placeholder="Nome do paciente">
+
+        <label>Resumo do atendimento</label>
+        <textarea id="prontResumo" rows="3"></textarea>
+
+        <button onclick="salvarProntuario()">Salvar prontuário</button>
+
+        <h3>Prontuários recentes</h3>
+        <ul id="listaProntuarios">
+          <!-- prontuários -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Emitir Receita Digital</h2>
+        <label>Paciente</label>
+        <input id="recPaciente" type="text" placeholder="Nome do paciente">
+
+        <label>Medicamento</label>
+        <input id="recMedicamento" type="text">
+
+        <label>Posologia</label>
+        <input id="recPosologia" type="text" placeholder="Ex: 1 comprimido de 8 em 8h">
+
+        <button onclick="emitirReceita()">Emitir receita</button>
+
+        <h3>Receitas emitidas</h3>
+        <ul id="listaReceitas">
+          <!-- receitas -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Acompanhar Histórico do Paciente</h2>
+        <label>Nome do paciente</label>
+        <input id="histNomePaciente" type="text" placeholder="Digite o nome">
+
+        <button onclick="verHistoricoPorPaciente()">Ver histórico</button>
+
+        <ul id="listaHistoricoPacienteMedico">
+          <!-- histórico filtrado -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Telemedicina do Profissional</h2>
+        <p>Aqui o profissional inicia a “videochamada segura” (simulada) e faz registros online.</p>
+        <button onclick="iniciarTeleconsultaMedico()">Iniciar teleconsulta com paciente</button>
+      </div>
+    </section>
+
+    <!-- ADMINISTRADOR -->
+    <section id="adminSection" class="escondido">
+      <div class="card">
+        <h2>Gerenciar Cadastros</h2>
+        <h3>Novo paciente (admin)</h3>
+        <label>Nome</label>
+        <input id="adminPacNome" type="text">
+        <button onclick="adminCadastrarPaciente()">Adicionar paciente</button>
+
+        <h3>Novo profissional</h3>
+        <label>Nome</label>
+        <input id="adminProfNome" type="text">
+        <button onclick="adminCadastrarProfissional()">Adicionar profissional</button>
+
+        <h3>Listagem rápida</h3>
+        <p><strong>Pacientes cadastrados:</strong></p>
+        <ul id="adminListaPacientes"></ul>
+
+        <p><strong>Profissionais cadastrados:</strong></p>
+        <ul id="adminListaProfissionais"></ul>
+      </div>
+
+      <div class="card">
+        <h2>Controle de Internações</h2>
+        <label>Paciente</label>
+        <input id="intPaciente" type="text">
+
+        <label>Leito</label>
+        <input id="intLeito" type="text" placeholder="Ex: Leito 12B">
+
+        <button onclick="registrarInternacao()">Registrar internação</button>
+
+        <h3>Internações</h3>
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Leito</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaInternacoes">
+            <!-- internações -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Relatórios (simples)</h2>
+        <p>Resumo numérico do sistema (simulação de relatório administrativo).</p>
+        <ul>
+          <li>Total de pacientes: <span id="relPacientes">0</span></li>
+          <li>Total de profissionais: <span id="relProfissionais">0</span></li>
+          <li>Total de consultas: <span id="relConsultas">0</span></li>
+          <li>Total de internações ativas: <span id="relInternacoes">0</span></li>
+        </ul>
+        <button onclick="atualizarRelatorios()">Atualizar relatórios</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p id="textoRodape">VidaPlus - Projeto Acadêmico SGHSS</p>
+  </footer>
+
+  <script>
+    // "Banco de dados" simples em memória para o protótipo
+    var pacientes = [];
+    var profissionais = [];
+    var consultas = [];
+    var notificacoesPaciente = [];
+    var prontuarios = [];
+    var receitas = [];
+    var internacoes = [];
+
+    // ------ CONTROLE DE TELAS ------
+    function mostrarSecao(idSecao) {
+      var secoes = ["loginSection", "pacienteSection", "medicoSection", "adminSection"];
+      for (var i = 0; i < secoes.length; i++) {
+        var sec = document.getElementById(secoes[i]);
+        if (sec) {
+          if (secoes[i] === idSecao) {
+            sec.classList.remove("escondido");
+          } else {
+            sec.classList.add("escondido");
+          }
+        }
+      }
+    }
+
+    function atualizarTopoERodape(textoTopo, textoRodape) {
+      document.getElementById("tituloTopo").innerText = textoTopo;
+      document.getElementById("textoRodape").innerText = textoRodape;
+    }
+
+    function fazerLogin() {
+      var user = document.getElementById("user").value;
+      var pass = document.getElementById("pass").value;
+      var perfil = document.getElementById("perfil").value;
+
+      if (!user || !pass || !perfil) {
+        alert("Preencha usuário, senha e perfil.");
+        return;
+      }
+
+      if (perfil === "paciente") {
+        mostrarSecao("pacienteSection");
+        atualizarTopoERodape("Área do Paciente - SGHSS", "VidaPlus - Área do Paciente");
+        renderHistoricoPaciente();
+        renderConsultasPaciente();
+        renderNotificacoes();
+      } else if (perfil === "medico") {
+        mostrarSecao("medicoSection");
+        atualizarTopoERodape("Área do Profissional de Saúde - SGHSS", "VidaPlus - Área do Profissional");
+        renderAgendaMedico();
+        renderProntuarios();
+        renderReceitas();
+      } else if (perfil === "admin") {
+        mostrarSecao("adminSection");
+        atualizarTopoERodape("Área Administrativa - SGHSS", "VidaPlus - Área Administrativa");
+        renderListasAdmin();
+        renderInternacoes();
+        atualizarRelatorios();
+      }
+    }
+
+    function voltarParaLogin() {
+      mostrarSecao("loginSection");
+      atualizarTopoERodape("SGHSS - Sistema de Gestão Hospitalar", "VidaPlus - Projeto Acadêmico SGHSS");
+    }
+
+    // ------ PACIENTE: CADASTRO ------
+    function salvarCadastroPaciente() {
+      var nome = document.getElementById("cadNome").value;
+      var cpf = document.getElementById("cadCpf").value;
+      var data = document.getElementById("cadData").value;
+      var info = document.getElementById("cadInfo").value;
+
+      if (!nome || !cpf || !data) {
+        alert("Preencha pelo menos nome, CPF e data de nascimento.");
+        return;
+      }
+
+      pacientes.push({
+        nome: nome,
+        cpf: cpf,
+        dataNasc: data,
+        info: info
+      });
+
+      adicionarNotificacao("Cadastro realizado com sucesso.");
+      alert("Cadastro salvo (simulado).");
+      renderHistoricoPaciente();
+      renderListasAdmin();
+      atualizarRelatorios();
+    }
+
+    // ------ PACIENTE: CONSULTAS ------
+    function agendarConsulta() {
+      var data = document.getElementById("agData").value;
+      var esp = document.getElementById("agEsp").value;
+      var tipo = document.getElementById("agTipo").value;
+
+      if (!data) {
+        alert("Escolha uma data para a consulta.");
+        return;
+      }
+
+      var consulta = {
+        id: Date.now(),
+        data: data,
+        especialidade: esp,
+        tipo: tipo,
+        paciente: document.getElementById("cadNome").value || "Paciente logado",
+        status: "Agendada"
+      };
+
+      consultas.push(consulta);
+      adicionarNotificacao("Consulta agendada para " + data + " (" + esp + ").");
+      alert("Consulta agendada (simulação).");
+      renderConsultasPaciente();
+      renderAgendaMedico();
+      atualizarRelatorios();
+    }
+
+    function renderConsultasPaciente() {
+      var lista = document.getElementById("listaConsultas");
+      if (!lista) return;
+      lista.innerHTML = "";
+
+      consultas.forEach(function(c) {
+        if (c.status !== "Cancelada") {
+          var li = document.createElement("li");
+          li.innerText = c.data + " - " + c.especialidade + " (" + c.tipo + ") - " + c.status;
+
+          var btn = document.createElement("button");
+          btn.innerText = "Cancelar";
+          btn.style.marginTop = "5px";
+          btn.onclick = function() {
+            cancelarConsulta(c.id);
+          };
+
+          li.appendChild(document.createElement("br"));
+          li.appendChild(btn);
+          lista.appendChild(li);
+        }
+      });
+
+      if (consultas.length === 0 || !lista.hasChildNodes()) {
+        lista.innerHTML = "<li>Nenhuma consulta agendada.</li>";
+      }
+    }
+
+    function cancelarConsulta(id) {
+      consultas.forEach(function(c) {
+        if (c.id === id) {
+          c.status = "Cancelada";
+          adicionarNotificacao("Consulta em " + c.data + " foi cancelada.");
+        }
+      });
+      alert("Consulta cancelada (simulação).");
+      renderConsultasPaciente();
+      renderAgendaMedico();
+      atualizarRelatorios();
+    }
+
+    // ------ PACIENTE: HISTÓRICO ------
+    function renderHistoricoPaciente() {
+      var ul = document.getElementById("historicoPaciente");
+      if (!ul) return;
+      ul.innerHTML = "";
+
+      prontuarios.forEach(function(p) {
+        var li = document.createElement("li");
+        li.innerText = p.data + " - " + p.paciente + " - " + p.resumo;
+        ul.appendChild(li);
+      });
+
+      if (prontuarios.length === 0) {
+        ul.innerHTML = "<li>Ainda não há registros de prontuário.</li>";
+      }
+    }
+
+    // ------ PACIENTE: NOTIFICAÇÕES ------
+    function adicionarNotificacao(texto) {
+      notificacoesPaciente.push(texto);
+      renderNotificacoes();
+    }
+
+    function renderNotificacoes() {
+      var ul = document.getElementById("listaNotificacoes");
+      if (!ul) return;
+      ul.innerHTML = "";
+
+      if (notificacoesPaciente.length === 0) {
+        ul.innerHTML = "<li>Sem notificações no momento.</li>";
+        return;
+      }
+
+      notificacoesPaciente.forEach(function(n) {
+        var li = document.createElement("li");
+        li.innerText = n;
+        ul.appendChild(li);
+      });
+    }
+
+    function limparNotificacoes() {
+      notificacoesPaciente = [];
+      renderNotificacoes();
+    }
+
+    // ------ PACIENTE: TELECONSULTA ------
+    function iniciarTeleconsultaPaciente() {
+      alert("Iniciando videochamada segura (simulada)...");
+      adicionarNotificacao("Teleconsulta iniciada com sucesso (simulação).");
+    }
+
+    // ------ MÉDICO: AGENDA ------
+    function renderAgendaMedico() {
+      var tbody = document.getElementById("tabelaAgendaMedico");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      consultas.forEach(function(c) {
+        var tr = document.createElement("tr");
+
+        var tdData = document.createElement("td");
+        tdData.innerText = c.data;
+        tr.appendChild(tdData);
+
+        var tdPaciente = document.createElement("td");
+        tdPaciente.innerText = c.paciente;
+        tr.appendChild(tdPaciente);
+
+        var tdTipo = document.createElement("td");
+        tdTipo.innerText = c.tipo;
+        tr.appendChild(tdTipo);
+
+        var tdStatus = document.createElement("td");
+        tdStatus.innerText = c.status;
+        tr.appendChild(tdStatus);
+
+        var tdAcao = document.createElement("td");
+        var btn = document.createElement("button");
+        btn.innerText = "Concluir";
+        btn.onclick = function() {
+          c.status = "Concluída";
+          renderAgendaMedico();
+          renderConsultasPaciente();
+        };
+        tdAcao.appendChild(btn);
+        tr.appendChild(tdAcao);
+
+        tbody.appendChild(tr);
+      });
+
+      if (consultas.length === 0) {
+        var trVazio = document.createElement("tr");
+        var tdVazio = document.createElement("td");
+        tdVazio.colSpan = 5;
+        tdVazio.innerText = "Nenhuma consulta na agenda.";
+        trVazio.appendChild(tdVazio);
+        tbody.appendChild(trVazio);
+      }
+    }
+
+    function adicionarHorarioMedico() {
+      var data = document.getElementById("medData").value;
+      var paciente = document.getElementById("medPaciente").value;
+      var tipo = document.getElementById("medTipo").value;
+
+      if (!data || !paciente) {
+        alert("Preencha data e nome do paciente.");
+        return;
+      }
+
+      consultas.push({
+        id: Date.now(),
+        data: data,
+        especialidade: "Agenda manual",
+        tipo: tipo,
+        paciente: paciente,
+        status: "Agendada"
+      });
+
+      alert("Horário adicionado à agenda (simulado).");
+      renderAgendaMedico();
+      atualizarRelatorios();
+    }
+
+    // ------ MÉDICO: PRONTUÁRIO ------
+    function salvarProntuario() {
+      var paciente = document.getElementById("prontPaciente").value;
+      var resumo = document.getElementById("prontResumo").value;
+
+      if (!paciente || !resumo) {
+        alert("Informe paciente e resumo.");
+        return;
+      }
+
+      var p = {
+        paciente: paciente,
+        resumo: resumo,
+        data: new Date().toLocaleDateString()
+      };
+
+      prontuarios.push(p);
+      alert("Prontuário salvo (simulado).");
+      document.getElementById("prontResumo").value = "";
+      renderProntuarios();
+      renderHistoricoPaciente();
+    }
+
+    function renderProntuarios() {
+      var ul = document.getElementById("listaProntuarios");
+      if (!ul) return;
+      ul.innerHTML = "";
+
+      prontuarios.forEach(function(p) {
+        var li = document.createElement("li");
+        li.innerText = p.data + " - " + p.paciente + ": " + p.resumo;
+        ul.appendChild(li);
+      });
+
+      if (prontuarios.length === 0) {
+        ul.innerHTML = "<li>Nenhum prontuário registrado.</li>";
+      }
+    }
+
+    // ------ MÉDICO: RECEITAS DIGITAIS ------
+    function emitirReceita() {
+      var paciente = document.getElementById("recPaciente").value;
+      var medicamento = document.getElementById("recMedicamento").value;
+      var posologia = document.getElementById("recPosologia").value;
+
+      if (!paciente || !medicamento || !posologia) {
+        alert("Preencha todos os campos da receita.");
+        return;
+      }
+
+      var r = {
+        paciente: paciente,
+        medicamento: medicamento,
+        posologia: posologia,
+        data: new Date().toLocaleDateString()
+      };
+
+      receitas.push(r);
+      alert("Receita digital emitida (simulada).");
+      renderReceitas();
+    }
+
+    function renderReceitas() {
+      var ul = document.getElementById("listaReceitas");
+      if (!ul) return;
+      ul.innerHTML = "";
+
+      receitas.forEach(function(r) {
+        var li = document.createElement("li");
+        li.innerText = r.data + " - " + r.paciente + " - " + r.medicamento + " (" + r.posologia + ")";
+        ul.appendChild(li);
+      });
+
+      if (receitas.length === 0) {
+        ul.innerHTML = "<li>Nenhuma receita emitida.</li>";
+      }
+    }
+
+    // ------ MÉDICO: HISTÓRICO POR PACIENTE ------
+    function verHistoricoPorPaciente() {
+      var nome = document.getElementById("histNomePaciente").value;
+      var ul = document.getElementById("listaHistoricoPacienteMedico");
+      if (!ul) return;
+      ul.innerHTML = "";
+
+      if (!nome) {
+        alert("Informe o nome do paciente para buscar o histórico.");
+        return;
+      }
+
+      var encontrados = prontuarios.filter(function(p) {
+        return p.paciente.toLowerCase().indexOf(nome.toLowerCase()) !== -1;
+      });
+
+      if (encontrados.length === 0) {
+        ul.innerHTML = "<li>Nenhum registro encontrado para esse paciente.</li>";
+      } else {
+        encontrados.forEach(function(p) {
+          var li = document.createElement("li");
+          li.innerText = p.data + " - " + p.resumo;
+          ul.appendChild(li);
+        });
+      }
+    }
+
+    // ------ MÉDICO: TELEMEDICINA ------
+    function iniciarTeleconsultaMedico() {
+      alert("Iniciando teleconsulta segura com o paciente (simulação).");
+    }
+
+    // ------ ADMIN: CADASTROS ------
+    function adminCadastrarPaciente() {
+      var nome = document.getElementById("adminPacNome").value;
+      if (!nome) {
+        alert("Informe o nome do paciente.");
+        return;
+      }
+      pacientes.push({ nome: nome });
+      document.getElementById("adminPacNome").value = "";
+      renderListasAdmin();
+      atualizarRelatorios();
+    }
+
+    function adminCadastrarProfissional() {
+      var nome = document.getElementById("adminProfNome").value;
+      if (!nome) {
+        alert("Informe o nome do profissional.");
+        return;
+      }
+      profissionais.push({ nome: nome });
+      document.getElementById("adminProfNome").value = "";
+      renderListasAdmin();
+      atualizarRelatorios();
+    }
+
+    function renderListasAdmin() {
+      var ulPac = document.getElementById("adminListaPacientes");
+      var ulProf = document.getElementById("adminListaProfissionais");
+      if (!ulPac || !ulProf) return;
+
+      ulPac.innerHTML = "";
+      pacientes.forEach(function(p) {
+        var li = document.createElement("li");
+        li.innerText = p.nome;
+        ulPac.appendChild(li);
+      });
+      if (pacientes.length === 0) {
+        ulPac.innerHTML = "<li>Nenhum paciente cadastrado.</li>";
+      }
+
+      ulProf.innerHTML = "";
+      profissionais.forEach(function(p) {
+        var li2 = document.createElement("li");
+        li2.innerText = p.nome;
+        ulProf.appendChild(li2);
+      });
+      if (profissionais.length === 0) {
+        ulProf.innerHTML = "<li>Nenhum profissional cadastrado.</li>";
+      }
+    }
+
+    // ------ ADMIN: INTERNAÇÕES ------
+    function registrarInternacao() {
+      var paciente = document.getElementById("intPaciente").value;
+      var leito = document.getElementById("intLeito").value;
+
+      if (!paciente || !leito) {
+        alert("Preencha paciente e leito.");
+        return;
+      }
+
+      internacoes.push({
+        id: Date.now(),
+        paciente: paciente,
+        leito: leito,
+        status: "Internado"
+      });
+
+      alert("Internação registrada (simulada).");
+      renderInternacoes();
+      atualizarRelatorios();
+    }
+
+    function darAlta(id) {
+      internacoes.forEach(function(i) {
+        if (i.id === id) {
+          i.status = "Alta";
+        }
+      });
+      renderInternacoes();
+      atualizarRelatorios();
+    }
+
+    function renderInternacoes() {
+      var tbody = document.getElementById("tabelaInternacoes");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      internacoes.forEach(function(i) {
+        var tr = document.createElement("tr");
+
+        var tdPac = document.createElement("td");
+        tdPac.innerText = i.paciente;
+        tr.appendChild(tdPac);
+
+        var tdLeito = document.createElement("td");
+        tdLeito.innerText = i.leito;
+        tr.appendChild(tdLeito);
+
+        var tdStatus = document.createElement("td");
+        tdStatus.innerText = i.status;
+        tr.appendChild(tdStatus);
+
+        var tdAcao = document.createElement("td");
+        if (i.status === "Internado") {
+          var btn = document.createElement("button");
+          btn.innerText = "Dar alta";
+          btn.onclick = function() {
+            darAlta(i.id);
+          };
+          tdAcao.appendChild(btn);
+        } else {
+          tdAcao.innerText = "-";
+        }
+        tr.appendChild(tdAcao);
+
+        tbody.appendChild(tr);
+      });
+
+      if (internacoes.length === 0) {
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        td.colSpan = 4;
+        td.innerText = "Nenhuma internação registrada.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    // ------ ADMIN: RELATÓRIOS ------
+    function atualizarRelatorios() {
+      var spanPac = document.getElementById("relPacientes");
+      var spanProf = document.getElementById("relProfissionais");
+      var spanCons = document.getElementById("relConsultas");
+      var spanInt = document.getElementById("relInternacoes");
+
+      if (!spanPac) return;
+
+      spanPac.innerText = pacientes.length;
+      spanProf.innerText = profissionais.length;
+      spanCons.innerText = consultas.length;
+      spanInt.innerText = internacoes.filter(function(i) { return i.status === "Internado"; }).length;
+    }
+  </script>
+</body>
+</html>
